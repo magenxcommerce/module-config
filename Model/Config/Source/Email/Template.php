@@ -6,8 +6,6 @@
 namespace Magento\Config\Model\Config\Source\Email;
 
 /**
- * Source for template
- *
  * @api
  * @since 100.0.2
  */

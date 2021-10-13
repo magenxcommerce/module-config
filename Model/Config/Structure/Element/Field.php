@@ -8,8 +8,6 @@
 namespace Magento\Config\Model\Config\Structure\Element;
 
 /**
- * Element field.
- *
  * @api
  * @since 100.0.2
  */
@@ -150,7 +148,7 @@ class Field extends \Magento\Config\Model\Config\Structure\AbstractElement
      */
     public function getType()
     {
-        return $this->_data['type'] ?? 'text';
+        return isset($this->_data['type']) ? $this->_data['type'] : 'text';
     }
 
     /**
@@ -204,7 +202,7 @@ class Field extends \Magento\Config\Model\Config\Structure\AbstractElement
      */
     public function getFrontendClass()
     {
-        return $this->_data['frontend_class'] ?? '';
+        return isset($this->_data['frontend_class']) ? $this->_data['frontend_class'] : '';
     }
 
     /**
@@ -245,7 +243,6 @@ class Field extends \Magento\Config\Model\Config\Structure\AbstractElement
      */
     public function getGroupPath()
     {
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
         return dirname($this->getConfigPath() ?: $this->getPath());
     }
 
@@ -256,7 +253,7 @@ class Field extends \Magento\Config\Model\Config\Structure\AbstractElement
      */
     public function getConfigPath()
     {
-        return $this->_data['config_path'] ?? null;
+        return isset($this->_data['config_path']) ? $this->_data['config_path'] : null;
     }
 
     /**
@@ -334,7 +331,7 @@ class Field extends \Magento\Config\Model\Config\Structure\AbstractElement
      */
     public function getValidation()
     {
-        return $this->_data['validate'] ?? null;
+        return isset($this->_data['validate']) ? $this->_data['validate'] : null;
     }
 
     /**

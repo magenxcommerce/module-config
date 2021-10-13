@@ -3,17 +3,10 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-declare(strict_types=1);
-
 namespace Magento\Config\Observer\Config\Backend\Admin;
 
 use Magento\Framework\Event\ObserverInterface;
 
-/**
- * Class AfterCustomUrlChangedObserver redirects to new custom admin URL.
- *
- * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
- */
 class AfterCustomUrlChangedObserver implements ObserverInterface
 {
     /**
@@ -63,6 +56,7 @@ class AfterCustomUrlChangedObserver implements ObserverInterface
      *
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
+     * @SuppressWarnings(PHPMD.ExitExpression)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
@@ -74,7 +68,6 @@ class AfterCustomUrlChangedObserver implements ObserverInterface
         $this->_authSession->destroy();
         $adminUrl = $this->_backendData->getHomePageUrl();
         $this->_response->setRedirect($adminUrl)->sendResponse();
-        // phpcs:ignore Magento2.Security.LanguageConstruct.ExitUsage
         exit(0);
     }
 }

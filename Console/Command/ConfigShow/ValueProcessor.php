@@ -97,7 +97,7 @@ class ValueProcessor
         $field = $configStructure->getElementByConfigPath($path);
 
         /** @var Value $backendModel */
-        $backendModel = $field instanceof Field && $field->hasBackendModel()
+        $backendModel = $field && $field->hasBackendModel()
             ? $field->getBackendModel()
             : $this->configValueFactory->create();
 

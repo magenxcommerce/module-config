@@ -3,36 +3,32 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-declare(strict_types=1);
-
 namespace Magento\Config\Test\Unit\Model\Config\Reader\Source\Deployed;
 
+use Magento\Config\Model\Config\Reader;
 use Magento\Config\Model\Config\Reader\Source\Deployed\SettingChecker;
-use Magento\Config\Model\Placeholder\PlaceholderFactory;
-use Magento\Config\Model\Placeholder\PlaceholderInterface;
 use Magento\Framework\App\Config;
-use Magento\Framework\App\Config\ScopeCodeResolver;
 use Magento\Framework\App\DeploymentConfig;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Magento\Config\Model\Placeholder\PlaceholderInterface;
+use Magento\Config\Model\Placeholder\PlaceholderFactory;
 
 /**
  * Test class for checking settings that defined in config file
  */
-class SettingCheckerTest extends TestCase
+class SettingCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Config|MockObject
+     * @var Config|\PHPUnit_Framework_MockObject_MockObject
      */
     private $configMock;
 
     /**
-     * @var PlaceholderInterface|MockObject
+     * @var PlaceholderInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $placeholderMock;
 
     /**
-     * @var Config\ScopeCodeResolver|MockObject
+     * @var Config\ScopeCodeResolver|\PHPUnit_Framework_MockObject_MockObject
      */
     private $scopeCodeResolverMock;
 
@@ -46,14 +42,14 @@ class SettingCheckerTest extends TestCase
      */
     private $env;
 
-    protected function setUp(): void
+    public function setUp()
     {
         $this->configMock = $this->getMockBuilder(DeploymentConfig::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->placeholderMock = $this->getMockBuilder(PlaceholderInterface::class)
             ->getMockForAbstractClass();
-        $this->scopeCodeResolverMock = $this->getMockBuilder(ScopeCodeResolver::class)
+        $this->scopeCodeResolverMock = $this->getMockBuilder(Config\ScopeCodeResolver::class)
             ->disableOriginalConstructor()
             ->getMock();
         $placeholderFactoryMock = $this->getMockBuilder(PlaceholderFactory::class)
@@ -75,23 +71,15 @@ class SettingCheckerTest extends TestCase
      * @param string $scopeCode
      * @param string|null $confValue
      * @param array $variables
-     * @param array $configMap
      * @param bool $expectedResult
      * @dataProvider isReadonlyDataProvider
      */
-    public function testIsReadonly(
-        $path,
-        $scope,
-        $scopeCode,
-        $confValue,
-        array $variables,
-        array $configMap,
-        $expectedResult
-    ) {
-        $this->placeholderMock->expects($this->any())
+    public function testIsReadonly($path, $scope, $scopeCode, $confValue, array $variables, $expectedResult)
+    {
+        $this->placeholderMock->expects($this->once())
             ->method('isApplicable')
             ->willReturn(true);
-        $this->placeholderMock->expects($this->any())
+        $this->placeholderMock->expects($this->once())
             ->method('generate')
             ->with($path, $scope, $scopeCode)
             ->willReturn('SOME_PLACEHOLDER');
@@ -107,18 +95,13 @@ class SettingCheckerTest extends TestCase
 
         $this->configMock->expects($this->any())
             ->method('get')
-            ->willReturnMap(
-                array_merge(
-                    [
-                        [
-                            'system/' . $scope . "/" . ($scopeCode ? $scopeCode . '/' : '') . $path,
-                            null,
-                            $confValue
-                        ],
-                    ],
-                    $configMap
-                )
-            );
+            ->willReturnMap([
+                [
+                    'system/' . $scope . "/" . ($scopeCode ? $scopeCode . '/' : '') . $path,
+                    null,
+                    $confValue
+                ],
+            ]);
 
         $this->assertSame($expectedResult, $this->checker->isReadOnly($path, $scope, $scopeCode));
     }
@@ -135,7 +118,6 @@ class SettingCheckerTest extends TestCase
                 'scopeCode' => 'myWebsite',
                 'confValue' => 'value',
                 'variables' => [],
-                'configMap' => [],
                 'expectedResult' => true,
             ],
             [
@@ -144,7 +126,6 @@ class SettingCheckerTest extends TestCase
                 'scopeCode' => 'myWebsite',
                 'confValue' => null,
                 'variables' => ['SOME_PLACEHOLDER' => 'value'],
-                'configMap' => [],
                 'expectedResult' => true,
             ],
             [
@@ -153,63 +134,12 @@ class SettingCheckerTest extends TestCase
                 'scopeCode' => 'myWebsite',
                 'confValue' => null,
                 'variables' => [],
-                'configMap' => [],
                 'expectedResult' => false,
-            ],
-            [
-                'path' => 'general/web/locale',
-                'scope' => 'website',
-                'scopeCode' => 'myWebsite',
-                'confValue' => null,
-                'variables' => [],
-                'configMap' => [
-                    [
-                        'system/default/general/web/locale',
-                        null,
-                        'default_value',
-                    ],
-                ],
-                'expectedResult' => true,
-            ],
-            [
-                'path' => 'general/web/locale',
-                'scope' => 'website',
-                'scopeCode' => 'myWebsite',
-                'confValue' => null,
-                'variables' => [],
-                'configMap' => [
-                    [
-                        'system/default/general/web/locale',
-                        null,
-                        'default_value',
-                    ],
-                ],
-                'expectedResult' => true,
-            ],
-            [
-                'path' => 'general/web/locale',
-                'scope' => 'store',
-                'scopeCode' => 'myStore',
-                'confValue' => null,
-                'variables' => [],
-                'configMap' => [
-                    [
-                        'system/default/general/web/locale',
-                        null,
-                        'default_value',
-                    ],
-                    [
-                        'system/website/myWebsite/general/web/locale',
-                        null,
-                        null,
-                    ],
-                ],
-                'expectedResult' => true,
             ]
         ];
     }
 
-    protected function tearDown(): void
+    protected function tearDown()
     {
         $_ENV = $this->env;
     }

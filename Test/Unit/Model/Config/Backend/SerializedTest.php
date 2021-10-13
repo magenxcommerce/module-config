@@ -3,41 +3,29 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-declare(strict_types=1);
-
 namespace Magento\Config\Test\Unit\Model\Config\Backend;
 
 use Magento\Config\Model\Config\Backend\Serialized;
-use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 
-class SerializedTest extends TestCase
+class SerializedTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Serialized */
+    /** @var \Magento\Config\Model\Config\Backend\Serialized */
     private $serializedConfig;
 
-    /** @var Json|MockObject */
+    /** @var Json|\PHPUnit_Framework_MockObject_MockObject */
     private $serializerMock;
 
-    /** @var LoggerInterface|MockObject */
-    private $loggerMock;
-
-    protected function setUp(): void
+    protected function setUp()
     {
         $objectManager = new ObjectManager($this);
         $this->serializerMock = $this->createMock(Json::class);
-        $this->loggerMock = $this->getMockForAbstractClass(LoggerInterface::class);
         $contextMock = $this->createMock(Context::class);
-        $eventManagerMock = $this->getMockForAbstractClass(ManagerInterface::class);
+        $eventManagerMock = $this->createMock(\Magento\Framework\Event\ManagerInterface::class);
         $contextMock->method('getEventDispatcher')
             ->willReturn($eventManagerMock);
-        $contextMock->method('getLogger')
-            ->willReturn($this->loggerMock);
         $this->serializedConfig = $objectManager->getObject(
             Serialized::class,
             [
@@ -82,20 +70,6 @@ class SerializedTest extends TestCase
                 ['string array']
             ]
         ];
-    }
-
-    public function testAfterLoadWithException()
-    {
-        $value = '{"key":';
-        $expected = false;
-        $this->serializedConfig->setValue($value);
-        $this->serializerMock->expects($this->once())
-            ->method('unserialize')
-            ->willThrowException(new \Exception());
-        $this->loggerMock->expects($this->once())
-            ->method('critical');
-        $this->serializedConfig->afterLoad();
-        $this->assertEquals($expected, $this->serializedConfig->getValue());
     }
 
     /**
